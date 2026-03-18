@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+transformers
+torch
+sqlalchemy
+pymysql
+cryptography
+python-dotenv
+langchain
+langchain-community
+langchain-huggingface
+sentence-transformers
+pinecone
