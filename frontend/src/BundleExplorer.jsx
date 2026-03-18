@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import oleaBanner from "./assets/olea-sunset.svg";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const bundleMeta = {
   0: { code: "BH-001", name: "Basic Health", monthly: "$89/mo", tint: "#2dd4bf" },
