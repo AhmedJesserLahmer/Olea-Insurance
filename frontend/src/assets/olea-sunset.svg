@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">OLEA Sunset Banner</title>
+  <desc id="desc">Sunset gradient with circular emblem and savannah silhouettes inspired by OLEA branding.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d34e2d"/>
+      <stop offset="45%" stop-color="#d66624"/>
+      <stop offset="100%" stop-color="#8f2f1e"/>
+    </linearGradient>
+    <linearGradient id="sunRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffb02f"/>
+      <stop offset="100%" stop-color="#ff8300"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="360" fill="url(#sky)"/>
+
+  <circle cx="600" cy="120" r="72" fill="none" stroke="url(#sunRing)" stroke-width="22"/>
+  <rect x="566" y="120" width="68" height="32" fill="#bf4b2f"/>
+
+  <path d="M0 282 C80 262 150 272 220 278 C290 282 350 260 430 274 C500 286 560 266 640 276 C720 286 790 264 860 274 C920 284 980 272 1040 270 C1110 268 1160 276 1200 282 L1200 360 L0 360 Z" fill="#2f1a14"/>
+  <path d="M0 300 C120 288 220 306 340 300 C430 296 520 312 620 306 C710 302 810 316 900 306 C1010 294 1100 314 1200 300 L1200 360 L0 360 Z" fill="#1e120f" opacity="0.78"/>
+
+  <g transform="translate(120,226) scale(0.85)">
+    <ellipse cx="54" cy="66" rx="28" ry="16" fill="#4b2f21"/>
+    <rect x="70" y="32" width="18" height="44" rx="8" fill="#4b2f21"/>
+    <circle cx="82" cy="24" r="14" fill="#4b2f21"/>
+    <circle cx="84" cy="22" r="3" fill="#f7c25a"/>
+    <rect x="44" y="74" width="7" height="30" rx="3" fill="#4b2f21"/>
+    <rect x="62" y="74" width="7" height="30" rx="3" fill="#4b2f21"/>
+    <rect x="84" y="74" width="7" height="30" rx="3" fill="#4b2f21"/>
+    <rect x="102" y="74" width="7" height="30" rx="3" fill="#4b2f21"/>
+    <path d="M72 8 L84 0 L96 8" fill="none" stroke="#4b2f21" stroke-width="4"/>
+  </g>
+
+  <g transform="translate(980,224)" fill="#3c241a">
+    <rect x="0" y="16" width="8" height="56" rx="2"/>
+    <path d="M4 18 C-22 12 -34 26 -48 18 C-36 8 -24 0 2 6 C24 12 40 8 54 18 C38 20 28 22 4 18 Z"/>
+    <rect x="82" y="22" width="8" height="52" rx="2"/>
+    <path d="M84 24 C62 16 52 28 40 22 C54 8 66 2 88 10 C108 16 120 12 132 22 C116 24 106 26 84 24 Z"/>
+  </g>
+
+  <g transform="translate(600,252)">
+    <text x="0" y="0" text-anchor="middle" fill="#f7ece2" font-size="58" font-family="Arial, sans-serif" letter-spacing="12">OLEA</text>
+    <text x="0" y="28" text-anchor="middle" fill="#ffdcb6" font-size="14" font-family="Arial, sans-serif" letter-spacing="3">INSURANCE TAILORED FOR AFRICA</text>
+  </g>
+</svg>

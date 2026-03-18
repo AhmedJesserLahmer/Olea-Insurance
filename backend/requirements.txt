@@ -11,3 +11,10 @@ langchain-community
 langchain-huggingface
 sentence-transformers
 pinecone
+joblib
+pandas
+numpy
+lightgbm
+pypdf
+passlib[bcrypt]
+python-jose[cryptography]
