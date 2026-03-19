@@ -3,7 +3,10 @@ import axios from "axios";
 import oleaBanner from "./assets/olea-sunset.svg";
 
 const rawApiBase = (import.meta.env.VITE_API_BASE_URL || "").trim();
-const API_BASE = rawApiBase ? rawApiBase.replace(/\/+$/, "") : (import.meta.env.DEV ? "http://localhost:8000" : "");
+const DEFAULT_PROD_API_BASE = "https://olea-insurance-3.onrender.com";
+const API_BASE = rawApiBase
+  ? rawApiBase.replace(/\/+$/, "")
+  : (import.meta.env.DEV ? "http://localhost:8000" : DEFAULT_PROD_API_BASE);
 const isApiNotConfigured = !API_BASE && !import.meta.env.DEV;
 
 function apiUrl(path) {
