@@ -2,7 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import oleaBanner from "./assets/olea-sunset.svg";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const rawApiBase = (import.meta.env.VITE_API_BASE_URL || "").trim();
+const API_BASE = rawApiBase ? rawApiBase.replace(/\/+$/, "") : (import.meta.env.DEV ? "http://localhost:8000" : "");
+const isApiNotConfigured = !API_BASE && !import.meta.env.DEV;
+
+function apiUrl(path) {
+  return API_BASE ? `${API_BASE}${path}` : path;
+}
 
 const bundleMeta = {
   0: { code: "BH-001", name: "Basic Health", monthly: "$89/mo", tint: "#2dd4bf" },
@@ -97,14 +103,14 @@ export default function BundleExplorer() {
   };
 
   const loadCurrentUser = async (sessionToken) => {
-    const res = await axios.get(`${API_BASE}/auth/me`, {
+    const res = await axios.get(apiUrl("/auth/me"), {
       headers: { Authorization: `Bearer ${sessionToken}` },
     });
     setUser(res.data);
   };
 
   const loadSavedPredictions = async (sessionToken) => {
-    const res = await axios.get(`${API_BASE}/predictions/me`, {
+    const res = await axios.get(apiUrl("/predictions/me"), {
       headers: { Authorization: `Bearer ${sessionToken}` },
     });
     setSavedPredictions(res.data || []);
@@ -139,14 +145,14 @@ export default function BundleExplorer() {
 
     try {
       if (authMode === "signup") {
-        await axios.post(`${API_BASE}/auth/signup`, {
+        await axios.post(apiUrl("/auth/signup"), {
           email: authForm.email,
           full_name: authForm.full_name,
           password: authForm.password,
         });
       }
 
-      const loginRes = await axios.post(`${API_BASE}/auth/login`, {
+      const loginRes = await axios.post(apiUrl("/auth/login"), {
         email: authForm.email,
         password: authForm.password,
       });
@@ -158,6 +164,11 @@ export default function BundleExplorer() {
       setAuthForm({ full_name: "", email: "", password: "" });
       setAuthError("");
     } catch (error) {
+      if (!error?.response) {
+        setAuthError("Cannot reach API. Set VITE_API_BASE_URL in Vercel to your Render backend URL.");
+        return;
+      }
+
       const detail = error?.response?.data?.detail;
       setAuthError(detail || "Authentication failed. Please verify your details.");
     } finally {
@@ -198,10 +209,15 @@ export default function BundleExplorer() {
         grace_period_extensions: Number(profile.grace_period_extensions),
       };
 
-      const res = await axios.post(`${API_BASE}/predict-bundle`, payload, { headers: authHeaders });
+      const res = await axios.post(apiUrl("/predict-bundle"), payload, { headers: authHeaders });
       setPrediction(res.data);
       await loadSavedPredictions(token);
     } catch (error) {
+      if (!error?.response) {
+        setPredictError("Cannot reach API. Set VITE_API_BASE_URL in Vercel to your Render backend URL.");
+        return;
+      }
+
       const detail = error?.response?.data?.detail;
       setPredictError(detail || "Prediction service unavailable. Start backend and ensure model dependencies are installed.");
     } finally {
@@ -218,13 +234,18 @@ export default function BundleExplorer() {
 
     try {
       const res = await axios.post(
-        `${API_BASE}/rag`,
+        apiUrl("/rag"),
         { question: ragQuestion },
         { headers: authHeaders }
       );
       setRagAnswer(res.data.response);
       setRagQuestion("");
     } catch (error) {
+      if (!error?.response) {
+        setRagError("Cannot reach API. Set VITE_API_BASE_URL in Vercel to your Render backend URL.");
+        return;
+      }
+
       const detail = error?.response?.data?.detail;
       setRagError(detail || "RAG endpoint unavailable. Verify your API keys and backend state.");
     } finally {
@@ -559,6 +580,11 @@ export default function BundleExplorer() {
       {!user ? (
         <section className="auth-card">
           <h2>Access Your OLEA Workspace</h2>
+          {isApiNotConfigured ? (
+            <p className="error" style={{ marginTop: 8 }}>
+              API is not configured for this deployment. Set VITE_API_BASE_URL in Vercel to your Render backend URL.
+            </p>
+          ) : null}
           <div className="auth-tabs">
             <button type="button" className={`tab ${authMode === "signin" ? "active" : ""}`} onClick={() => setAuthMode("signin")}>
               Sign In
