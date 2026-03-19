@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import oleaBanner from "./assets/olea-sunset.svg";
 
-const rawApiBase = (import.meta.env.VITE_API_BASE_URL || "").trim();
-const DEFAULT_PROD_API_BASE = "https://olea-insurance-3.onrender.com";
+const rawApiBase = (import.meta.env.VITE_API_URL || "").trim();
+const DEFAULT_PROD_API_BASE = "VITE_API_URL";
 const API_BASE = rawApiBase
   ? rawApiBase.replace(/\/+$/, "")
   : (import.meta.env.DEV ? "http://localhost:8000" : DEFAULT_PROD_API_BASE);
