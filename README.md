@@ -51,4 +51,9 @@ Our stack was carefully selected to optimize performance and reduce friction dur
 - **Generative AI (RAG):** Pinecone (Vector database) + Embedding model + TinyLlama
 - **DevOps & Cloud Deployment:** Docker, GitHub Actions (CI/CD Pipeline), Vercel (Frontend Hosting), Render (Backend Hosting)
 
+## 📸 Screenshots
+<img width="1915" height="1082" alt="image" src="https://github.com/user-attachments/assets/e95ce8f5-5751-4ca8-85a1-ba19706997d9" />
+<img width="1918" height="1091" alt="image" src="https://github.com/user-attachments/assets/d88a9fdc-7c72-4392-827e-919d72f40af0" />
+
+
 
