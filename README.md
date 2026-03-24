@@ -47,7 +47,7 @@ Our stack was carefully selected to optimize performance and reduce friction dur
 - **Frontend:** React + Vite
 - **Backend (API Layer):** FastAPI (Python)
 - **Database:** MySQL via SQLAlchemy ORM
-- **Machine Learning:** Scikit-learn (`model.pkl` predicting bundle probabilities)
+- **Machine Learning:** Scikit-learn (`model.pkl` using XGBClassifier to predict bundle probabilities)
 - **Generative AI (RAG):** Pinecone (Vector database) + Embedding model + TinyLlama
 - **DevOps & Cloud Deployment:** Docker, GitHub Actions (CI/CD Pipeline), Vercel (Frontend Hosting), Render (Backend Hosting)
 
