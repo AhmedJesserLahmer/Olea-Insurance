@@ -16,7 +16,7 @@ Olea-Insurance is a comprehensive insurance recommendation assistant that provid
 - **Secure User Authentication:** Visitor sign up, login, and secured profile access.
 - **Smart Bundle Predictions:** Machine Learning-driven insurance bundle recommendations based on user profile and input data.
 - **RAG-based Insurance Chat:** An AI assistant powered by a Retrieval-Augmented Generation (RAG) pipeline to dynamically answer context-specific insurance questions.
-- **Prediction History:** Automatically records and retrieves user prediction and chat histories.
+- **Prediction History:** Automatically records and retrieves user prediction and chat histories
 
 ## 🏗️ Architecture & Planning
 
