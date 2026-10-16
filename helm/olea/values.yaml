@@ -24,6 +24,9 @@ postgres:
   enabled: true
   image: postgres:16-alpine
   storage: 5Gi
+  # Set to publish the database on the host through a LoadBalancer (local clusters only;
+  # never expose a production database this way)
+  hostPort: null
   resources:
     requests: { cpu: 100m, memory: 256Mi }
     limits: { memory: 1Gi }

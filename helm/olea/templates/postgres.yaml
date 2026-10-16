@@ -13,6 +13,25 @@ spec:
   ports:
     - name: postgres
       port: 5432
+{{- if .Values.postgres.hostPort }}
+---
+# Local only: publishes PostgreSQL on the host (localhost:<hostPort>) for pgAdmin / psql.
+# On Docker Desktop the LoadBalancer is served by cloud-provider-kind, like the Ingress.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-external
+  labels:
+    app: postgres
+    {{- include "olea.labels" . | nindent 4 }}
+spec:
+  type: LoadBalancer
+  selector: { app: postgres }
+  ports:
+    - name: postgres
+      port: {{ .Values.postgres.hostPort }}
+      targetPort: 5432
+{{- end }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
