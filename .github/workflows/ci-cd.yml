@@ -158,10 +158,14 @@ jobs:
         with:
           version: v3.18.3
       - name: Configure cluster access
+        # Passed as an env var, not interpolated into the script, so the secret never
+        # becomes part of the shell command text
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config
+          umask 077
+          printf '%s' "$KUBE_CONFIG" | base64 -d > ~/.kube/config
       - name: Upgrade the release to this commit's images
         # --atomic waits for every rollout and rolls the whole release back if one fails
         run: |
