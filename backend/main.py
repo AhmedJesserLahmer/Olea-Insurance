@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from models import Base, ChatHistory, User, PredictionHistory
@@ -39,6 +40,15 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.get("/health")
+def health(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Database unavailable") from exc
+    return {"status": "ok"}
+
 
 @app.post("/rag", response_model=ChatResponse)
 def chat(request: ChatRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
