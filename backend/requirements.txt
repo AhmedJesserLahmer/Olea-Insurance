@@ -1,22 +1,4 @@
-fastapi
-uvicorn
-transformers
-torch
-accelerate
-sqlalchemy
-cryptography
-python-dotenv
-langchain
-langchain-community
-langchain-huggingface
-langchain-pinecone
-sentence-transformers
-pinecone
-joblib
-pandas
-numpy
-lightgbm
-pypdf
-passlib[bcrypt]
-python-jose[cryptography]
-psycopg2-binary
+# Everything, for the all-in-one main.py (e.g. Render).
+# Each service image installs only its own file from requirements/.
+-r requirements/prediction.txt
+-r requirements/rag.txt

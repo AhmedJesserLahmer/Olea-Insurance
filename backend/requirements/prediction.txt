@@ -1,0 +1,8 @@
+-r base.txt
+joblib
+numpy
+pandas
+lightgbm
+# model.pkl was pickled with scikit-learn 1.8.0; other versions warn and may mis-predict
+scikit-learn==1.8.0
+pypdf

@@ -1,0 +1,10 @@
+# Shared by every service (api-svc, history-writer)
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-dotenv
+cryptography
+passlib[bcrypt]
+python-jose[cryptography]
+confluent-kafka
