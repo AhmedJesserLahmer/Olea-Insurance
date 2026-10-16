@@ -5,10 +5,13 @@ import axios from "axios";
 
 const isDev = process.env.NODE_ENV !== "production";
 const rawApiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "").trim();
-const API_BASE = rawApiBase
-  ? rawApiBase.replace(/\/+$/, "")
-  : (isDev ? "http://localhost:8000" : "");
-const isApiNotConfigured = !API_BASE && !isDev;
+// "/" means same origin: a gateway or Kubernetes Ingress routes the API paths on this host
+const API_BASE = rawApiBase === "/"
+  ? ""
+  : rawApiBase
+    ? rawApiBase.replace(/\/+$/, "")
+    : (isDev ? "http://localhost:8000" : "");
+const isApiNotConfigured = !rawApiBase && !isDev;
 
 function apiUrl(path) {
   return API_BASE ? `${API_BASE}${path}` : path;
