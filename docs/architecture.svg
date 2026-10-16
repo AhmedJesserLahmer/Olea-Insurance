@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030">
+<defs><filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/></filter>
+<marker id="head" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="head-e8590c" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11" fill="none" stroke="#e8590c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="head-1971c2" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="head-2f9e44" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11" fill="none" stroke="#2f9e44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="head-495057" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11" fill="none" stroke="#495057" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1600" height="1030" fill="#ffffff"/>
+<text x="40" y="48" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="28" font-weight="bold" text-anchor="start" fill="#1e1e1e">Olea Insurance — target architecture</text>
+<text x="40" y="74" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="15" font-weight="normal" text-anchor="start" fill="#495057">Kubernetes + NGINX Ingress · Kafka event pipeline · PostgreSQL · CI/CD to Docker Hub</text>
+<circle cx="90" cy="335" r="40" fill="#f8f9fa" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<circle cx="90" cy="322" r="12" fill="none" stroke="#1e1e1e" stroke-width="2"/>
+<path d="M66 360 Q90 330 114 360" fill="none" stroke="#1e1e1e" stroke-width="2"/>
+<text x="90" y="400" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Client</text>
+<text x="90" y="420" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="13" font-weight="normal" text-anchor="middle" fill="#495057">(browser)</text>
+<path d="M132 335 L210 335" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" marker-end="url(#head)" filter="url(#rough)"/>
+<polygon points="310.0,361.0 265.0,387.0 220.0,361.0 220.0,309.0 265.0,283.0 310.0,309.0" fill="#2f9e44" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="265" y="345" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="28" font-weight="bold" text-anchor="middle" fill="#ffffff">N+</text>
+<text x="265" y="412" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e1e1e">NGINX Ingress</text>
+<text x="265" y="432" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Controller</text>
+<text x="265" y="454" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#495057">TLS · path routing</text>
+<rect x="380" y="100" width="1000" height="600" rx="22" fill="none" stroke="#495057" stroke-width="2" stroke-dasharray="10 8" filter="url(#rough)"/>
+<g transform="translate(404,118)"><polygon points="14,0 26,6 29,19 21,29 7,29 -1,19 2,6" fill="#326ce5" stroke="#1e1e1e" stroke-width="1.5"/><circle cx="14" cy="15" r="6" fill="none" stroke="#fff" stroke-width="2"/></g>
+<text x="442" y="140" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="20" font-weight="bold" text-anchor="start" fill="#1e1e1e">Kubernetes cluster</text>
+<text x="668" y="140" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="13" font-weight="normal" text-anchor="start" fill="#495057">namespace: olea</text>
+<rect x="420" y="165" width="280" height="110" rx="14" fill="#a5d8ff" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="436" y="195" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="start" fill="#1e1e1e">frontend-svc</text>
+<text x="436" y="219" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1e1e1e">Next.js · Deployment ×2</text>
+<text x="436" y="249" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="11" font-weight="normal" text-anchor="start" fill="#343a40">route: /</text>
+<rect x="628" y="179" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="620" y="187" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="612" y="195" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<text x="641" y="223" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="13" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Pod</text>
+<path d="M318 335 C 360 335, 370 220, 416 220" fill="none" stroke="#2f9e44" stroke-width="2" stroke-linecap="round" marker-end="url(#head-2f9e44)" filter="url(#rough)"/>
+<rect x="420" y="297" width="280" height="110" rx="14" fill="#b2f2bb" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="436" y="327" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="start" fill="#1e1e1e">api-svc</text>
+<text x="436" y="351" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1e1e1e">FastAPI · auth + history · ×2</text>
+<text x="436" y="381" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="11" font-weight="normal" text-anchor="start" fill="#343a40">route: /auth/*, /predictions/me</text>
+<rect x="628" y="311" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="620" y="319" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="612" y="327" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<text x="641" y="355" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="13" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Pod</text>
+<path d="M318 335 C 360 335, 370 352, 416 352" fill="none" stroke="#2f9e44" stroke-width="2" stroke-linecap="round" marker-end="url(#head-2f9e44)" filter="url(#rough)"/>
+<rect x="420" y="429" width="280" height="110" rx="14" fill="#ffec99" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="436" y="459" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="start" fill="#1e1e1e">prediction-svc</text>
+<text x="436" y="483" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1e1e1e">FastAPI + model.pkl · ×2</text>
+<text x="436" y="513" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="11" font-weight="normal" text-anchor="start" fill="#343a40">route: /predict-bundle</text>
+<rect x="628" y="443" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="620" y="451" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="612" y="459" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<text x="641" y="487" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="13" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Pod</text>
+<path d="M318 335 C 360 335, 370 484, 416 484" fill="none" stroke="#2f9e44" stroke-width="2" stroke-linecap="round" marker-end="url(#head-2f9e44)" filter="url(#rough)"/>
+<rect x="420" y="561" width="280" height="110" rx="14" fill="#d0bfff" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="436" y="591" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="start" fill="#1e1e1e">rag-svc</text>
+<text x="436" y="615" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1e1e1e">FastAPI + TinyLlama · ×1</text>
+<text x="436" y="645" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="11" font-weight="normal" text-anchor="start" fill="#343a40">route: /rag</text>
+<rect x="628" y="575" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="620" y="583" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<rect x="612" y="591" width="58" height="44" rx="6" fill="#ffffff" stroke="#1e1e1e" stroke-width="1.6" filter="url(#rough)"/>
+<text x="641" y="619" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="13" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Pod</text>
+<path d="M318 335 C 360 335, 370 616, 416 616" fill="none" stroke="#2f9e44" stroke-width="2" stroke-linecap="round" marker-end="url(#head-2f9e44)" filter="url(#rough)"/>
+<rect x="770" y="330" width="240" height="230" rx="14" fill="#ffd8a8" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="890" y="362" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="22" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Kafka</text>
+<text x="890" y="384" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">KRaft · 3 brokers</text>
+<rect x="786" y="404" width="208" height="34" rx="8" fill="#fff4e6" stroke="#1e1e1e" stroke-width="1.5" filter="url(#rough)"/>
+<text x="890" y="426" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">client.profile.submitted</text>
+<rect x="786" y="450" width="208" height="34" rx="8" fill="#fff4e6" stroke="#1e1e1e" stroke-width="1.5" filter="url(#rough)"/>
+<text x="890" y="472" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">prediction.completed</text>
+<rect x="786" y="496" width="208" height="34" rx="8" fill="#fff4e6" stroke="#1e1e1e" stroke-width="1.5" filter="url(#rough)"/>
+<text x="890" y="518" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">chat.completed</text>
+<path d="M702 479 C 735 479, 735 430, 766 430" fill="none" stroke="#e8590c" stroke-width="2" stroke-linecap="round" marker-end="url(#head-e8590c)" filter="url(#rough)"/>
+<text x="708" y="501" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#e8590c">publish</text>
+<path d="M702 611 C 740 611, 740 530, 766 530" fill="none" stroke="#e8590c" stroke-width="2" stroke-linecap="round" marker-end="url(#head-e8590c)" filter="url(#rough)"/>
+<text x="708" y="633" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#e8590c">publish</text>
+<rect x="1060" y="340" width="280" height="120" rx="14" fill="#c3fae8" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="1076" y="372" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="start" fill="#1e1e1e">history-writer</text>
+<text x="1076" y="396" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1e1e1e">Kafka consumer group · ×2</text>
+<text x="1076" y="418" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1e1e1e">idempotent insert by event_id</text>
+<text x="1076" y="440" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#495057">retries · dead-letter topic</text>
+<path d="M1012 420 L1056 405" fill="none" stroke="#e8590c" stroke-width="2" stroke-linecap="round" marker-end="url(#head-e8590c)" filter="url(#rough)"/>
+<text x="1035" y="446" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="11" font-weight="normal" text-anchor="middle" fill="#e8590c">consume</text>
+<path d="M1090 562 L1090 676 A110 14 0 0 0 1310 676 L1310 562" fill="#e7f5ff" stroke="#1971c2" stroke-width="2" filter="url(#rough)"/>
+<ellipse cx="1200.0" cy="562" rx="110" ry="14" fill="#d0ebff" stroke="#1971c2" stroke-width="2" filter="url(#rough)"/>
+<text x="1200" y="600" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">PostgreSQL</text>
+<text x="1200" y="620" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">StatefulSet + PVC</text>
+<text x="1200" y="640" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="11" font-weight="normal" text-anchor="middle" fill="#1e1e1e">users · prediction_history</text>
+<text x="1200" y="656" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="11" font-weight="normal" text-anchor="middle" fill="#1e1e1e">chat_history</text>
+<path d="M1200 462 L1200 544" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" marker-end="url(#head-1971c2)" filter="url(#rough)"/>
+<text x="1210" y="510" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1971c2">write</text>
+<path d="M702 327 L1360 327 L1360 610 L1314 610" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" marker-end="url(#head-1971c2)" filter="url(#rough)"/>
+<text x="890" y="319" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1971c2">sync: create users · read history</text>
+<rect x="1420" y="330" width="160" height="100" rx="14" fill="#f1f3f5" stroke="#1e1e1e" stroke-width="2" stroke-dasharray="6 5" filter="url(#rough)"/>
+<text x="1500" y="362" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="17" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Pinecone</text>
+<text x="1500" y="384" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">managed vector DB</text>
+<text x="1500" y="404" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#495057">(external SaaS)</text>
+<path d="M702 646 L745 646 L745 688 L1398 688 L1398 380 L1416 380" fill="none" stroke="#495057" stroke-width="2" stroke-dasharray="7 6" stroke-linecap="round" marker-end="url(#head-495057)" filter="url(#rough)"/>
+<text x="760" y="682" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#495057">vector search</text>
+<rect x="20" y="740" width="1560" height="270" rx="22" fill="#fcfcfd" stroke="#495057" stroke-width="2" stroke-dasharray="10 8" filter="url(#rough)"/>
+<text x="40" y="772" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="20" font-weight="bold" text-anchor="start" fill="#1e1e1e">CI/CD — GitHub Actions</text>
+<text x="290" y="772" font-family="'Cascadia Code', 'JetBrains Mono', monospace" font-size="13" font-weight="normal" text-anchor="start" fill="#495057">on push to main</text>
+<rect x="40" y="815" width="210" height="120" rx="14" fill="#f1f3f5" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="145.0" y="853" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">git push</text>
+<text x="145.0" y="881" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">main branch</text>
+<text x="145.0" y="903" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">or pull request</text>
+<text x="56" y="837" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="bold" text-anchor="start" fill="#868e96">1</text>
+<rect x="300" y="815" width="210" height="120" rx="14" fill="#fff3bf" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="405.0" y="853" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Unit tests</text>
+<text x="405.0" y="881" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">pytest (backend)</text>
+<text x="405.0" y="903" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">next build + lint</text>
+<text x="316" y="837" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="bold" text-anchor="start" fill="#868e96">2</text>
+<path d="M254 875.0 L294 875.0" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" marker-end="url(#head)" filter="url(#rough)"/>
+<rect x="560" y="815" width="210" height="120" rx="14" fill="#fff3bf" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="665.0" y="853" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Smoke tests</text>
+<text x="665.0" y="881" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">docker compose up</text>
+<text x="665.0" y="903" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">curl /health · signup, predict</text>
+<text x="576" y="837" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="bold" text-anchor="start" fill="#868e96">3</text>
+<path d="M514 875.0 L554 875.0" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" marker-end="url(#head)" filter="url(#rough)"/>
+<rect x="820" y="815" width="210" height="120" rx="14" fill="#ffd8a8" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="925.0" y="853" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Build &amp; push</text>
+<text x="925.0" y="881" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">5 images · tag :git-sha</text>
+<text x="925.0" y="903" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">docker/build-push-action</text>
+<text x="836" y="837" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="bold" text-anchor="start" fill="#868e96">4</text>
+<path d="M774 875.0 L814 875.0" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" marker-end="url(#head)" filter="url(#rough)"/>
+<rect x="1080" y="815" width="210" height="120" rx="14" fill="#a5d8ff" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="1185.0" y="853" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Docker Hub</text>
+<text x="1185.0" y="881" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">olea/* repositories</text>
+<text x="1185.0" y="903" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">one image per service</text>
+<text x="1096" y="837" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="bold" text-anchor="start" fill="#868e96">5</text>
+<path d="M1034 875.0 L1074 875.0" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" marker-end="url(#head)" filter="url(#rough)"/>
+<rect x="1340" y="815" width="210" height="120" rx="14" fill="#b2f2bb" stroke="#1e1e1e" stroke-width="2" filter="url(#rough)"/>
+<text x="1445.0" y="853" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e1e1e">Deploy</text>
+<text x="1445.0" y="881" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">kubectl set image</text>
+<text x="1445.0" y="903" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="middle" fill="#1e1e1e">or Argo CD sync</text>
+<text x="1356" y="837" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="bold" text-anchor="start" fill="#868e96">6</text>
+<path d="M1294 875.0 L1334 875.0" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" marker-end="url(#head)" filter="url(#rough)"/>
+<text x="560" y="975" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="13" font-weight="normal" text-anchor="start" fill="#e03131">any failing test = pipeline stops, no image is pushed</text>
+<path d="M300 960 L770 960" stroke="#e03131" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>
+<path d="M1185.0 811 L1185.0 706" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" marker-end="url(#head-1971c2)" filter="url(#rough)"/>
+<text x="1195.0" y="728" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#1971c2">pods pull :git-sha</text>
+<path d="M1445.0 811 C 1445.0 760, 1372 760, 1372 706" fill="none" stroke="#2f9e44" stroke-width="2" stroke-linecap="round" marker-end="url(#head-2f9e44)" filter="url(#rough)"/>
+<text x="1453.0" y="782" font-family="Excalifont, Virgil, 'Comic Sans MS', 'Segoe Print', cursive" font-size="12" font-weight="normal" text-anchor="start" fill="#2f9e44">rolling update</text>
+</svg>
