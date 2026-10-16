@@ -51,6 +51,23 @@ Our stack was carefully selected to optimize performance and reduce friction dur
 - **Generative AI (RAG):** Pinecone (Vector database) + Embedding model + TinyLlama
 - **DevOps & Cloud Deployment:** Docker, GitHub Actions (CI/CD Pipeline), Vercel (Frontend Hosting), Render (Backend Hosting)
 
+## 🐳 Run with Docker
+
+```bash
+cp .env.example .env      # set POSTGRES_PASSWORD, JWT_SECRET_KEY, PINECONE_API_KEY
+docker compose up --build
+```
+
+| Service | URL |
+|---|---|
+| Frontend (Next.js) | http://localhost:3000 |
+| API (FastAPI) | http://localhost:8000 (health: `/health`, docs: `/docs`) |
+| PostgreSQL | `localhost:5432` |
+
+> ⚠️ The backend image installs torch and transformers. The first build downloads several GB and
+> needs plenty of free RAM; close heavy apps first. The API container is capped at `API_MEMORY_LIMIT`
+> (default `6g`). Its startup waits until PostgreSQL is healthy, and the frontend waits for the API.
+
 ## ⚙️ Local Setup
 
 **Database (PostgreSQL)**
