@@ -122,6 +122,24 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     }
 
 
+@app.post("/auth/demo", response_model=TokenResponse)
+def demo_login(db: Session = Depends(get_db)):
+    if not demo_mode_enabled():
+        raise HTTPException(status_code=404, detail="Direct access is disabled")
+
+    user = db.query(User).filter(User.email == DEMO_EMAIL).first()
+    if not user:
+        seed_demo_data(db)
+        user = db.query(User).filter(User.email == DEMO_EMAIL).first()
+
+    token = create_access_token(subject=user.email)
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {"id": user.id, "email": user.email, "full_name": user.full_name},
+    }
+
+
 @app.get("/auth/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
     return {"id": current_user.id, "email": current_user.email, "full_name": current_user.full_name}
