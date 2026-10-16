@@ -16,3 +16,6 @@ node_modules
 frontend
 docs
 RAG_Solution.ipynb
+.pytest_cache
+**/.pytest_cache
+backend/tests
