@@ -13,6 +13,7 @@ resources:
   - apps/prediction.yaml
   - apps/rag.yaml
   - apps/history-writer.yaml
+  - ingress.yaml
 
 # Image names in the manifests are placeholders: point them at your Docker Hub account.
 # CI deploys exact commit tags with `kubectl set image`; newTag is for the first apply.
