@@ -2,12 +2,14 @@ fastapi
 uvicorn
 transformers
 torch
+accelerate
 sqlalchemy
 cryptography
 python-dotenv
 langchain
 langchain-community
 langchain-huggingface
+langchain-pinecone
 sentence-transformers
 pinecone
 joblib
