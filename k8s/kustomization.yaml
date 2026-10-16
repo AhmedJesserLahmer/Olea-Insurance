@@ -7,3 +7,4 @@ resources:
   - namespace.yaml
   - config.yaml
   - postgres.yaml
+  - kafka.yaml
