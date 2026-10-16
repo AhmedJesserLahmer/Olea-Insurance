@@ -68,7 +68,18 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Tables are created automatically on startup.
+Tables are created automatically on startup. With `DEMO_MODE=true` (the default) the database is also
+seeded with mock data from [`backend/seed.py`](backend/seed.py): a demo account, two sample users,
+saved predictions and chat history. Run `python seed.py` to seed manually.
+
+| Account | Email | Password |
+|---|---|---|
+| Demo | `demo@olea.com` | `OleaDemo2026!` |
+| Sample | `sarah.benali@example.com` | `Password123!` |
+| Sample | `youssef.trabelsi@example.com` | `Password123!` |
+
+The **"Get a direct access here"** button on the main page signs in as the demo account without a password.
+Set `DEMO_MODE=false` in production to disable both the seed and direct access.
 
 **Frontend**
 
