@@ -3,7 +3,9 @@
 
 imageRegistry: olea-local
 imageTag: local
-imagePullPolicy: Never   # images are loaded into the cluster nodes, never pulled
+# Docker Desktop's registry mirror serves images from the local Docker image store;
+# Always re-pulls (locally, in seconds) so a rebuilt :local image is never stale.
+imagePullPolicy: Always
 
 secrets:
   create: true   # values come from .env via --set-string (never committed)
