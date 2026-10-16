@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, Text, String, Float, ForeignKey, DateTime
-from sqlalchemy.types import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -30,8 +30,8 @@ class PredictionHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    input_payload = Column(JSON, nullable=False)
-    output_payload = Column(JSON, nullable=False)
+    input_payload = Column(JSONB, nullable=False)
+    output_payload = Column(JSONB, nullable=False)
     recommended_bundle_id = Column(Integer, nullable=False)
     confidence = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

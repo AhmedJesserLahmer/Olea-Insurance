@@ -3,7 +3,6 @@ uvicorn
 transformers
 torch
 sqlalchemy
-pymysql
 cryptography
 python-dotenv
 langchain
