@@ -16,8 +16,13 @@ from schemas import (
 )
 from bundle_model import predict_bundle
 from auth import get_password_hash, verify_password, create_access_token, get_current_user
+from seed import DEMO_EMAIL, demo_mode_enabled, seed_demo_data
 
 Base.metadata.create_all(bind=engine)
+
+if demo_mode_enabled():
+    with SessionLocal() as seed_session:
+        seed_demo_data(seed_session)
 
 app = FastAPI()
 
