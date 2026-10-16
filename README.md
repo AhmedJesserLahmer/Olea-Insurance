@@ -1,10 +1,10 @@
 <div align="center">
-  <img src="frontend/src/assets/olea-sunset.svg" alt="Olea-Sunset Presentation Header" width="100%">
+  <img src="frontend/public/olea-sunset.svg" alt="Olea-Sunset Presentation Header" width="100%">
 </div>
 
 # Olea-Insurance
 
-Full-stack ML application that serves real-time predictions via a FastAPI backend and React front-end. Includes automated CI/CD with GitHub Actions and deployed on Vercel + Render, built during OLEA hackathon (final version).
+Full-stack ML application that serves real-time predictions via a FastAPI backend and Next.js front-end. Includes automated CI/CD with GitHub Actions and deployed on Vercel + Render, built during OLEA hackathon (final version).
 
 You can check out our application yourself using this link !
 https://olea-insurance.vercel.app/
@@ -44,12 +44,42 @@ sequenceDiagram
 
 Our stack was carefully selected to optimize performance and reduce friction during ML integration:
 
-- **Frontend:** React + Vite
+- **Frontend:** Next.js (App Router) + React
 - **Backend (API Layer):** FastAPI (Python)
 - **Database:** PostgreSQL via SQLAlchemy ORM (psycopg2)
 - **Machine Learning:** Scikit-learn (`model.pkl` using XGBClassifier to predict bundle probabilities)
 - **Generative AI (RAG):** Pinecone (Vector database) + Embedding model + TinyLlama
 - **DevOps & Cloud Deployment:** Docker, GitHub Actions (CI/CD Pipeline), Vercel (Frontend Hosting), Render (Backend Hosting)
+
+## ⚙️ Local Setup
+
+**Database (PostgreSQL)**
+
+```bash
+createdb olea   # or use any hosted PostgreSQL instance
+```
+
+**Backend**
+
+```bash
+cd backend
+cp .env.example .env   # set DATABASE_URL=postgresql+psycopg2://user:pass@host:5432/olea
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Tables are created automatically on startup.
+
+**Frontend**
+
+```bash
+cd frontend
+cp .env.example .env.local   # NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+npm install
+npm run dev
+```
+
+On Vercel, set the project **Root Directory** to `frontend` and define `NEXT_PUBLIC_API_BASE_URL`.
 
 ## 📸 Screenshots
 <img width="1915" height="1082" alt="image" src="https://github.com/user-attachments/assets/e95ce8f5-5751-4ca8-85a1-ba19706997d9" />

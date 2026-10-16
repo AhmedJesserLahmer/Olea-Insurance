@@ -55,7 +55,7 @@ Out of scope for first version:
 
 Main components:
 
-1. Frontend (React + Vite): collects user input and displays results.
+1. Frontend (Next.js): collects user input and displays results.
 2. Backend (FastAPI): business logic and API layer.
 3. Database (PostgreSQL via SQLAlchemy): users, chat history, prediction history.
 4. ML model (model.pkl): predicts bundle probabilities.
