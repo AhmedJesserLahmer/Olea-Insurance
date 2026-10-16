@@ -38,7 +38,8 @@ spec:
       initContainers:
         - name: wait-for-postgres
           image: {{ $.Values.postgres.image }}
-          command: ["sh", "-c", "until pg_isready -h postgres -p 5432; do echo waiting for postgres; sleep 2; done"]
+          # -U is required: uid 1000 has no passwd entry, so pg_isready cannot guess a user name
+          command: ["sh", "-c", "until pg_isready -h postgres -p 5432 -U postgres; do echo waiting for postgres; sleep 2; done"]
           resources:
             requests: { cpu: 10m, memory: 16Mi }
             limits: { memory: 64Mi }
