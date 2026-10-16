@@ -25,9 +25,13 @@ up() {
   [ -f .env ] || { echo ".env not found: cp .env.example .env and fill it in"; exit 1; }
   set -a; . ./.env; set +a
 
-  echo "==> Tagging local images as olea-local/olea-<service>:local"
+  echo "==> Tagging local images with their content id"
+  image_tags=()
   for service in api prediction rag history-writer frontend; do
-    docker --context "$DOCKER_CONTEXT" tag "olea/$service:local" "olea-local/olea-$service:local"
+    # Same content -> same tag: unchanged images are not pulled again, rebuilt ones are
+    tag="local-$(docker --context "$DOCKER_CONTEXT" image inspect -f '{{.Id}}' "olea/$service:local" | cut -d: -f2 | cut -c1-12)"
+    docker --context "$DOCKER_CONTEXT" tag "olea/$service:local" "olea-local/olea-$service:$tag"
+    image_tags+=(--set-string "services.$service.tag=$tag")
   done
 
   echo "==> ingress-nginx (load balancer on localhost:$INGRESS_HTTP_PORT)"
@@ -51,6 +55,7 @@ up() {
     --set-string secrets.values.POSTGRES_DB="$POSTGRES_DB" \
     --set-string secrets.values.JWT_SECRET_KEY="$JWT_SECRET_KEY" \
     --set-string secrets.values.PINECONE_API_KEY="${PINECONE_API_KEY:-}" \
+    "${image_tags[@]}" \
     --wait --timeout 10m
 
   status

@@ -1,6 +1,6 @@
-{{/* Image reference for a service: <registry>/<image>:<tag> */}}
+{{/* Image reference for a service: <registry>/<image>:<tag>; services.<name>.tag overrides imageTag */}}
 {{- define "olea.image" -}}
-{{- printf "%s/%s:%s" .root.Values.imageRegistry .svc.image (toString .root.Values.imageTag) -}}
+{{- printf "%s/%s:%s" .root.Values.imageRegistry .svc.image (toString (.svc.tag | default .root.Values.imageTag)) -}}
 {{- end -}}
 
 {{/* Labels shared by every resource */}}

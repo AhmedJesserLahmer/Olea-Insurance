@@ -3,9 +3,9 @@
 
 imageRegistry: olea-local
 imageTag: local
-# Docker Desktop's registry mirror serves images from the local Docker image store;
-# Always re-pulls (locally, in seconds) so a rebuilt :local image is never stale.
-imagePullPolicy: Always
+# scripts/k8s_local.sh tags each image with its content id (services.<name>.tag), so a
+# rebuilt image gets a new tag. Nodes keep pulled images: no pulls after a restart.
+imagePullPolicy: IfNotPresent
 
 secrets:
   create: true   # values come from .env via --set-string (never committed)
