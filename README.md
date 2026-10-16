@@ -52,7 +52,7 @@ Our stack was carefully selected to optimize performance and reduce friction dur
 - **Messaging:** Apache Kafka (KRaft) with a PostgreSQL history-writer consumer
 - **Machine Learning:** LightGBM ensemble in `model.pkl` (scikit-learn 1.8 preprocessing)
 - **Generative AI (RAG):** Pinecone (Vector database) + Embedding model + TinyLlama
-- **DevOps:** Docker, docker compose, Kubernetes + NGINX Ingress, GitHub Actions → Docker Hub (CI/CD); Vercel + Render for the all-in-one deployment
+- **DevOps:** Docker, docker compose, Kubernetes (Helm) + NGINX Ingress, GitHub Actions → Docker Hub (CI/CD); Vercel + Render for the all-in-one deployment
 
 ## 🐳 Run locally with Docker
 
@@ -81,30 +81,52 @@ pytest                    # unit tests on SQLite, no PostgreSQL or Kafka needed
 
 [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) runs on every push and pull request:
 
-1. **Unit tests**: backend `pytest` and the frontend production build
+1. **Unit tests**: backend `pytest`, the frontend production build, and Helm chart lint/render
 2. **Smoke tests**: the full docker compose stack and `scripts/smoke_test.sh`
 3. **Build & push** (`main` only): 5 images to Docker Hub, tagged with the commit SHA and `latest`
-4. **Deploy** (`main`, opt-in): `kubectl set image` to the commit tag, wait for the rollout, roll back on failure
+4. **Deploy** (`main`, opt-in): `helm upgrade --install --atomic` with the commit tag; a failed rollout rolls the release back
 
 Repository settings: secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, and for deploys `KUBE_CONFIG`
 (base64 kubeconfig) plus the variable `DEPLOY_ENABLED=true`.
 
-## ☸️ Kubernetes
+## ☸️ Kubernetes (Helm)
 
-Manifests are in [`k8s/`](k8s): PostgreSQL, a 3-broker Kafka, the five services and the Ingress.
+The chart in [`helm/olea`](helm/olea) deploys PostgreSQL, Kafka (KRaft), the five services and the Ingress.
+[`values.yaml`](helm/olea/values.yaml) holds the production defaults (3 Kafka brokers, 2 replicas per service);
+[`values-local.yaml`](helm/olea/values-local.yaml) shrinks everything for a laptop.
+
+**Local cluster (Docker Desktop):** enable Kubernetes in Docker Desktop → Settings → Kubernetes
+(the *kind* option gives several nodes), install [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
+and [`helm`](https://helm.sh/docs/intro/install/), build the images once with `docker compose build`, then:
 
 ```bash
-# 1. ingress-nginx controller: https://kubernetes.github.io/ingress-nginx/deploy/
-# 2. Set your Docker Hub user in k8s/kustomization.yaml and your domain in k8s/ingress.yaml
-kubectl apply -f k8s/namespace.yaml
+./scripts/k8s_local.sh up        # ingress-nginx + the chart, secrets taken from .env
+BASE_URL=http://localhost:8090 ./scripts/smoke_test.sh
+./scripts/k8s_local.sh status    # nodes and pods
+./scripts/k8s_local.sh down
+```
+
+The app is served through the real NGINX Ingress Controller on **http://localhost:8090**; Docker Desktop's
+load balancer stands in for the cloud one. Give Docker Desktop at least ~6 GB of memory
+(Settings → Resources) and stop the compose stack (`docker compose stop`) while the cluster runs.
+
+**Production cluster:**
+
+```bash
+# 1. ingress-nginx controller
+helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx \
+  -n ingress-nginx --create-namespace
+# 2. Secrets (never committed)
+kubectl create namespace olea
 kubectl -n olea create secret generic olea-secrets \
   --from-literal=POSTGRES_USER=olea \
   --from-literal=POSTGRES_PASSWORD="$(openssl rand -hex 16)" \
   --from-literal=POSTGRES_DB=olea \
   --from-literal=JWT_SECRET_KEY="$(openssl rand -hex 32)" \
   --from-literal=PINECONE_API_KEY=<your key>
-kubectl apply -k k8s/
-BASE_URL=https://olea.example.com ./scripts/smoke_test.sh
+# 3. The app (CI runs this step on every push to main, with the commit's image tag)
+helm upgrade --install olea helm/olea -n olea \
+  --set imageRegistry=docker.io/<dockerhub user> --set ingress.host=<your domain> --atomic
 ```
 
 ## ⚙️ Local Setup without Docker (all-in-one)
