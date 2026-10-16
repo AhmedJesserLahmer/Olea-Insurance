@@ -148,6 +148,33 @@ export default function BundleExplorer() {
     hydrateAuth();
   }, [token]);
 
+  const startSession = (data) => {
+    localStorage.setItem("olea_token", data.access_token);
+    setToken(data.access_token);
+    setUser(data.user);
+    setAuthForm({ full_name: "", email: "", password: "" });
+    setAuthError("");
+  };
+
+  const directAccess = async () => {
+    setAuthError("");
+    setAuthLoading(true);
+
+    try {
+      const res = await axios.post(apiUrl("/auth/demo"));
+      startSession(res.data);
+    } catch (error) {
+      if (!error?.response) {
+        setAuthError("Cannot reach API. Set NEXT_PUBLIC_API_BASE_URL in Vercel to your Render backend URL.");
+        return;
+      }
+
+      setAuthError(error?.response?.data?.detail || "Direct access is unavailable right now.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const submitAuth = async (event) => {
     event.preventDefault();
     setAuthError("");
@@ -167,12 +194,7 @@ export default function BundleExplorer() {
         password: authForm.password,
       });
 
-      const sessionToken = loginRes.data.access_token;
-      localStorage.setItem("olea_token", sessionToken);
-      setToken(sessionToken);
-      setUser(loginRes.data.user);
-      setAuthForm({ full_name: "", email: "", password: "" });
-      setAuthError("");
+      startSession(loginRes.data);
     } catch (error) {
       if (!error?.response) {
         setAuthError("Cannot reach API. Set NEXT_PUBLIC_API_BASE_URL in Vercel to your Render backend URL.");
@@ -473,6 +495,27 @@ export default function BundleExplorer() {
 
         .btn:disabled { opacity: 0.58; cursor: not-allowed; }
 
+        .direct-access {
+          margin-top: 14px;
+          padding-top: 14px;
+          border-top: 1px dashed rgba(255, 181, 124, 0.3);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          font-size: 0.9rem;
+          color: #ffdecb;
+        }
+
+        .btn-direct {
+          background: transparent;
+          border: 1px solid rgba(255, 142, 51, 0.7);
+          box-shadow: none;
+        }
+
+        .btn-direct:hover:not(:disabled) { background: rgba(255, 142, 51, 0.16); }
+
         .result-main {
           border-radius: 14px;
           border: 1px solid rgba(255, 181, 124, 0.3);
@@ -643,6 +686,13 @@ export default function BundleExplorer() {
               </button>
             </div>
           </form>
+
+          <div className="direct-access">
+            <span>Just looking around? Explore with sample data, no account needed.</span>
+            <button className="btn btn-direct" type="button" onClick={directAccess} disabled={authLoading}>
+              Get a direct access here
+            </button>
+          </div>
         </section>
       ) : (
         <section className="layout">
