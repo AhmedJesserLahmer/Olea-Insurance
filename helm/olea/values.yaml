@@ -8,7 +8,9 @@ imagePullPolicy: IfNotPresent
 
 # Non-secret settings shared by the backend services (ConfigMap olea-config)
 config:
-  DEMO_MODE: "true"
+  # "true" seeds demo users and enables passwordless "Get a direct access here".
+  # Keep it off on any publicly reachable cluster.
+  DEMO_MODE: "false"
   ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
   PINECONE_ENV: gcp-starter
 

@@ -7,6 +7,9 @@ imageTag: local
 # rebuilt image gets a new tag. Nodes keep pulled images: no pulls after a restart.
 imagePullPolicy: IfNotPresent
 
+config:
+  DEMO_MODE: "true"   # demo users + direct access, local only
+
 secrets:
   create: true   # values come from .env via --set-string (never committed)
 
