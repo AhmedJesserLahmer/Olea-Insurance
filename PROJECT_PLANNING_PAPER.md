@@ -57,7 +57,7 @@ Main components:
 
 1. Frontend (React + Vite): collects user input and displays results.
 2. Backend (FastAPI): business logic and API layer.
-3. Database (MySQL via SQLAlchemy): users, chat history, prediction history.
+3. Database (PostgreSQL via SQLAlchemy): users, chat history, prediction history.
 4. ML model (model.pkl): predicts bundle probabilities.
 5. RAG stack (Pinecone + embedding model + TinyLlama): contextual insurance answers.
 
@@ -182,7 +182,7 @@ RAG endpoint returns contextual insurance answers.
 ### Phase 5: Integration and Deployment
 
 1. Add Dockerfile.
-2. Add docker-compose for backend + MySQL.
+2. Add docker-compose for backend + PostgreSQL.
 3. Verify health and environment config.
 4. Finalize frontend integration.
 

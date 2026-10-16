@@ -566,12 +566,12 @@ export default function BundleExplorer() {
         <div className="hero-text">
           <h1>Premium bundle matching for every profile.</h1>
           <p>
-            Sign in to save every account and prediction in MySQL. Enter customer data to run model.pkl predictions enriched
+            Sign in to save every account and prediction in PostgreSQL. Enter customer data to run model.pkl predictions enriched
             with PDF context snippets.
           </p>
           <div className="hero-kpis">
             <span>Auth: Sign up / Sign in</span>
-            <span>MySQL persistence</span>
+            <span>PostgreSQL persistence</span>
             <span>Saved prediction history</span>
           </div>
         </div>
@@ -676,7 +676,7 @@ export default function BundleExplorer() {
           </form>
 
           <div className="panel">
-            <div className="panel-head"><h2>Prediction Results</h2><span className="pill">Saved in MySQL</span></div>
+            <div className="panel-head"><h2>Prediction Results</h2><span className="pill">Saved in PostgreSQL</span></div>
 
             {prediction ? (
               <>
