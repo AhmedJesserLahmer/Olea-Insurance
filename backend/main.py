@@ -125,7 +125,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     if not user or not verify_password(request.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    token = create_access_token(subject=user.email)
+    token = create_access_token(subject=user.email, user_id=user.id)
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -143,7 +143,7 @@ def demo_login(db: Session = Depends(get_db)):
         seed_demo_data(db)
         user = db.query(User).filter(User.email == DEMO_EMAIL).first()
 
-    token = create_access_token(subject=user.email)
+    token = create_access_token(subject=user.email, user_id=user.id)
     return {
         "access_token": token,
         "token_type": "bearer",

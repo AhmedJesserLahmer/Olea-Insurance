@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import os
@@ -41,26 +42,50 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_access_token(subject: str, expires_delta: Optional[timedelta] = None) -> str:
-    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode = {"sub": subject, "exp": expire}
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+@dataclass(frozen=True)
+class TokenUser:
+    id: int
+    email: str
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
-    credentials_exception = HTTPException(
+def _credentials_exception() -> HTTPException:
+    return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+
+def create_access_token(subject: str, user_id: Optional[int] = None, expires_delta: Optional[timedelta] = None) -> str:
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode = {"sub": subject, "exp": expire}
+    if user_id is not None:
+        to_encode["uid"] = user_id
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def _decode(token: str) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-        if email is None:
-            raise credentials_exception
     except JWTError as exc:
-        raise credentials_exception from exc
+        raise _credentials_exception() from exc
+    if payload.get("sub") is None:
+        raise _credentials_exception()
+    return payload
+
+
+def get_token_user(token: str = Depends(oauth2_scheme)) -> TokenUser:
+    """Stateless check for services without access to the users table."""
+    payload = _decode(token)
+    if not isinstance(payload.get("uid"), int):
+        # Tokens issued before the uid claim existed: the client must sign in again
+        raise _credentials_exception()
+    return TokenUser(id=payload["uid"], email=payload["sub"])
+
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+    credentials_exception = _credentials_exception()
+    email = _decode(token)["sub"]
 
     user = db.query(User).filter(User.email == email).first()
     if user is None:
