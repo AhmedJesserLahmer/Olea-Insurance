@@ -1,13 +1,14 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import oleaBanner from "./assets/olea-sunset.svg";
 
-const rawApiBase = (import.meta.env.VITE_API_URL || "").trim();
-const DEFAULT_PROD_API_BASE = "VITE_API_URL";
+const isDev = process.env.NODE_ENV !== "production";
+const rawApiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "").trim();
 const API_BASE = rawApiBase
   ? rawApiBase.replace(/\/+$/, "")
-  : (import.meta.env.DEV ? "http://localhost:8000" : DEFAULT_PROD_API_BASE);
-const isApiNotConfigured = !API_BASE && !import.meta.env.DEV;
+  : (isDev ? "http://localhost:8000" : "");
+const isApiNotConfigured = !API_BASE && !isDev;
 
 function apiUrl(path) {
   return API_BASE ? `${API_BASE}${path}` : path;
@@ -93,8 +94,14 @@ export default function BundleExplorer() {
   const [authForm, setAuthForm] = useState({ full_name: "", email: "", password: "" });
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
-  const [token, setToken] = useState(() => localStorage.getItem("olea_token") || "");
+  const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
+
+  // localStorage is only available in the browser, so restore the session after mount.
+  useEffect(() => {
+    const storedToken = localStorage.getItem("olea_token");
+    if (storedToken) setToken(storedToken);
+  }, []);
 
   const canPredict = useMemo(() => !loadingPredict && Number(profile.age) >= 18 && !!token, [loadingPredict, profile.age, token]);
   const canAskRag = useMemo(() => ragQuestion.trim().length > 0 && !loadingRag && !!token, [ragQuestion, loadingRag, token]);
@@ -168,7 +175,7 @@ export default function BundleExplorer() {
       setAuthError("");
     } catch (error) {
       if (!error?.response) {
-        setAuthError("Cannot reach API. Set VITE_API_BASE_URL in Vercel to your Render backend URL.");
+        setAuthError("Cannot reach API. Set NEXT_PUBLIC_API_BASE_URL in Vercel to your Render backend URL.");
         return;
       }
 
@@ -217,7 +224,7 @@ export default function BundleExplorer() {
       await loadSavedPredictions(token);
     } catch (error) {
       if (!error?.response) {
-        setPredictError("Cannot reach API. Set VITE_API_BASE_URL in Vercel to your Render backend URL.");
+        setPredictError("Cannot reach API. Set NEXT_PUBLIC_API_BASE_URL in Vercel to your Render backend URL.");
         return;
       }
 
@@ -245,7 +252,7 @@ export default function BundleExplorer() {
       setRagQuestion("");
     } catch (error) {
       if (!error?.response) {
-        setRagError("Cannot reach API. Set VITE_API_BASE_URL in Vercel to your Render backend URL.");
+        setRagError("Cannot reach API. Set NEXT_PUBLIC_API_BASE_URL in Vercel to your Render backend URL.");
         return;
       }
 
@@ -576,7 +583,7 @@ export default function BundleExplorer() {
           </div>
         </div>
         <div className="hero-image">
-          <img src={oleaBanner} alt="OLEA sunset brand banner" />
+          <img src="/olea-sunset.svg" alt="OLEA sunset brand banner" />
         </div>
       </section>
 
@@ -585,7 +592,7 @@ export default function BundleExplorer() {
           <h2>Access Your OLEA Workspace</h2>
           {isApiNotConfigured ? (
             <p className="error" style={{ marginTop: 8 }}>
-              API is not configured for this deployment. Set VITE_API_BASE_URL in Vercel to your Render backend URL.
+              API is not configured for this deployment. Set NEXT_PUBLIC_API_BASE_URL in Vercel to your Render backend URL.
             </p>
           ) : null}
           <div className="auth-tabs">
