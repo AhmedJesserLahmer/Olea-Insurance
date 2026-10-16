@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from auth import get_password_hash
-from bundle_model import BUNDLE_META
+from bundles import BUNDLE_META
 from models import ChatHistory, PredictionHistory, User
 
 DEMO_EMAIL = "demo@olea.com"
