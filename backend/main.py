@@ -18,8 +18,9 @@ from schemas import (
 from bundle_model import predict_bundle
 from auth import get_password_hash, verify_password, create_access_token, get_current_user
 from seed import DEMO_EMAIL, demo_mode_enabled, seed_demo_data
+from db_init import init_db
 
-Base.metadata.create_all(bind=engine)
+init_db()
 
 if demo_mode_enabled():
     with SessionLocal() as seed_session:
