@@ -1,0 +1,54 @@
+{{- if .Values.ingress.enabled }}
+{{- $ing := .Values.ingress }}
+# NGINX Ingress: one entry point, routed by path to each Service.
+# Requires the ingress-nginx controller (see the chart README / project README).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: olea
+  labels:
+    {{- include "olea.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+spec:
+  ingressClassName: {{ $ing.className }}
+  rules:
+    - {{- if $ing.host }}
+      host: {{ $ing.host }}
+      {{- end }}
+      http:
+        paths:
+          - path: /auth
+            pathType: Prefix
+            backend: { service: { name: api-svc, port: { name: http } } }
+          - path: /predictions
+            pathType: Prefix
+            backend: { service: { name: api-svc, port: { name: http } } }
+          - path: /predict-bundle
+            pathType: Exact
+            backend: { service: { name: prediction-svc, port: { name: http } } }
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: frontend-svc, port: { name: http } } }
+---
+# Separate Ingress so only the chat gets the long timeout
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: olea-rag
+  labels:
+    {{- include "olea.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: {{ $ing.ragReadTimeout | quote }}
+spec:
+  ingressClassName: {{ $ing.className }}
+  rules:
+    - {{- if $ing.host }}
+      host: {{ $ing.host }}
+      {{- end }}
+      http:
+        paths:
+          - path: /rag
+            pathType: Exact
+            backend: { service: { name: rag-svc, port: { name: http } } }
+{{- end }}

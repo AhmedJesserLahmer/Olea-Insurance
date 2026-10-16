@@ -1,0 +1,99 @@
+{{- range $name, $svc := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+    {{- include "olea.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $svc.replicas }}
+  selector:
+    matchLabels: { app: {{ $name }} }
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0   # a new pod must be ready before an old one is removed
+  template:
+    metadata:
+      labels: { app: {{ $name }} }
+      {{- if $svc.backend }}
+      annotations:
+        # Restart pods when the shared config changes
+        checksum/config: {{ toJson $.Values.config | sha256sum }}
+      {{- end }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: { app: {{ $name }} }
+      {{- if $svc.waitForPostgres }}
+      initContainers:
+        - name: wait-for-postgres
+          image: {{ $.Values.postgres.image }}
+          command: ["sh", "-c", "until pg_isready -h postgres -p 5432; do echo waiting for postgres; sleep 2; done"]
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { memory: 64Mi }
+      {{- end }}
+      {{- if $svc.modelCacheSize }}
+      volumes:
+        - name: model-cache
+          emptyDir: { sizeLimit: {{ $svc.modelCacheSize }} }
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          image: {{ include "olea.image" (dict "root" $ "svc" $svc) }}
+          imagePullPolicy: {{ $.Values.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $svc.port }}
+          {{- if $svc.backend }}
+          envFrom:
+            - configMapRef: { name: olea-config }
+            - secretRef: { name: {{ $.Values.secrets.name }} }
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg2://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)
+          {{- end }}
+          startupProbe:
+            httpGet: { path: {{ $svc.healthPath }}, port: {{ $svc.port }} }
+            periodSeconds: 5
+            failureThreshold: {{ $svc.startupFailureThreshold | default 12 }}
+          readinessProbe:
+            httpGet: { path: {{ $svc.healthPath }}, port: {{ $svc.port }} }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: {{ $svc.healthPath }}, port: {{ $svc.port }} }
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            {{- toYaml $svc.resources | nindent 12 }}
+          {{- if $svc.modelCacheSize }}
+          volumeMounts:
+            - name: model-cache
+              mountPath: /app/.cache/huggingface
+          {{- end }}
+{{- if $svc.serviceName }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $svc.serviceName }}
+  labels:
+    app: {{ $name }}
+    {{- include "olea.labels" $ | nindent 4 }}
+spec:
+  selector: { app: {{ $name }} }   # every ready pod with this label receives traffic
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ $svc.port }}
+{{- end }}
+{{- end }}
