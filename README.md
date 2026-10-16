@@ -18,57 +18,96 @@ Olea-Insurance is a comprehensive insurance recommendation assistant that provid
 - **RAG-based Insurance Chat:** An AI assistant powered by a Retrieval-Augmented Generation (RAG) pipeline to dynamically answer context-specific insurance questions.
 - **Prediction History:** Automatically records and retrieves user prediction and chat histories
 
-## 🏗️ Architecture & Planning
+## 🏗️ Architecture
 
-Instead of heavy enterprise documentation, we utilized a streamlined architecture designed for rapid deployment and a clear separation of concerns between our ML and RAG inference capabilities.
+![Target architecture](docs/architecture.svg)
 
-```mermaid
-sequenceDiagram
-    actor User
-    participant Frontend
-    participant Backend
-    participant AI
-    participant DB
+The backend is split into services behind an NGINX Ingress (Kubernetes) or an NGINX gateway (docker compose).
+Every profile a client submits, every prediction and every chat answer is published to **Kafka** as an
+event; the **history-writer** consumes them and stores them in **PostgreSQL**.
 
-    User->>Frontend: Fill profile and submit
-    Frontend->>Backend: POST /prediction with token
-    Backend->>Backend: Validate schema and auth
-    Backend->>AI: predict(payload)
-    AI-->>Backend: recommendation
-    Backend->>DB: Save prediction history
-    Backend-->>Frontend: Prediction response
-    Frontend-->>User: Render bundle and confidence
-```
+| Service | Code | Routes | Role |
+|---|---|---|---|
+| frontend-svc | [`frontend/`](frontend) | `/` | Next.js UI |
+| api-svc | [`api_service.py`](backend/api_service.py) | `/auth/*`, `/predictions/me` | Accounts, history; owns the schema and demo seed |
+| prediction-svc | [`prediction_service.py`](backend/prediction_service.py) | `/predict-bundle` | Runs `model.pkl`, publishes `client.profile.submitted` + `prediction.completed` |
+| rag-svc | [`rag_service.py`](backend/rag_service.py) | `/rag` | Pinecone + TinyLlama, publishes `chat.completed` |
+| history-writer | [`history_writer.py`](backend/history_writer.py) | — | Kafka consumer → PostgreSQL |
+
+- **Exactly-once storage:** each event has an `event_id`; Kafka may redeliver, but
+  [`persistence.apply_event`](backend/persistence.py) stores each id once. Unstorable messages go to `history.dead-letter`.
+- **No Kafka? No problem:** without `KAFKA_BOOTSTRAP_SERVERS` (or if Kafka does not acknowledge an event)
+  events are written directly to PostgreSQL. The all-in-one [`main.py`](backend/main.py) (used on Render) works this way.
+- **Stateless auth:** tokens carry the user id, so prediction-svc and rag-svc verify them without a database lookup.
+
+How a request reaches a pod across the cluster's nodes: [docs/kubernetes-request-flow.svg](docs/kubernetes-request-flow.svg).
 
 ## 🛠️ Tools & Tech Stack
 
 Our stack was carefully selected to optimize performance and reduce friction during ML integration:
 
 - **Frontend:** Next.js (App Router) + React
-- **Backend (API Layer):** FastAPI (Python)
+- **Backend:** FastAPI (Python) services
 - **Database:** PostgreSQL via SQLAlchemy ORM (psycopg2)
-- **Machine Learning:** Scikit-learn (`model.pkl` using XGBClassifier to predict bundle probabilities)
+- **Messaging:** Apache Kafka (KRaft) with a PostgreSQL history-writer consumer
+- **Machine Learning:** LightGBM ensemble in `model.pkl` (scikit-learn 1.8 preprocessing)
 - **Generative AI (RAG):** Pinecone (Vector database) + Embedding model + TinyLlama
-- **DevOps & Cloud Deployment:** Docker, GitHub Actions (CI/CD Pipeline), Vercel (Frontend Hosting), Render (Backend Hosting)
+- **DevOps:** Docker, docker compose, Kubernetes + NGINX Ingress, GitHub Actions → Docker Hub (CI/CD); Vercel + Render for the all-in-one deployment
 
-## 🐳 Run with Docker
+## 🐳 Run locally with Docker
 
 ```bash
 cp .env.example .env      # set POSTGRES_PASSWORD, JWT_SECRET_KEY, PINECONE_API_KEY
 docker compose up --build
+./scripts/smoke_test.sh   # end-to-end check through the gateway
 ```
 
-| Service | URL |
-|---|---|
-| Frontend (Next.js) | http://localhost:3000 |
-| API (FastAPI) | http://localhost:8000 (health: `/health`, docs: `/docs`) |
-| PostgreSQL | `localhost:5432` |
+Open **http://localhost:8080**. The NGINX gateway routes paths like the Kubernetes Ingress does.
+PostgreSQL is also exposed on `localhost:5432` for inspection.
 
-> ⚠️ The backend image installs torch and transformers. The first build downloads several GB and
-> needs plenty of free RAM; close heavy apps first. The API container is capped at `API_MEMORY_LIMIT`
-> (default `6g`). Its startup waits until PostgreSQL is healthy, and the frontend waits for the API.
+> ⚠️ The rag image installs torch and transformers: the first build downloads several GB and needs free RAM.
+> Every container has a memory cap; the RAG service is capped at `RAG_MEMORY_LIMIT` (default `6g`).
+> Without `PINECONE_API_KEY` the chat returns an error, everything else works.
 
-## ⚙️ Local Setup
+## 🧪 Tests
+
+```bash
+cd backend
+pip install -r requirements/dev.txt
+pytest                    # unit tests on SQLite, no PostgreSQL or Kafka needed
+```
+
+## 🚦 CI/CD
+
+[`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) runs on every push and pull request:
+
+1. **Unit tests**: backend `pytest` and the frontend production build
+2. **Smoke tests**: the full docker compose stack and `scripts/smoke_test.sh`
+3. **Build & push** (`main` only): 5 images to Docker Hub, tagged with the commit SHA and `latest`
+4. **Deploy** (`main`, opt-in): `kubectl set image` to the commit tag, wait for the rollout, roll back on failure
+
+Repository settings: secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, and for deploys `KUBE_CONFIG`
+(base64 kubeconfig) plus the variable `DEPLOY_ENABLED=true`.
+
+## ☸️ Kubernetes
+
+Manifests are in [`k8s/`](k8s): PostgreSQL, a 3-broker Kafka, the five services and the Ingress.
+
+```bash
+# 1. ingress-nginx controller: https://kubernetes.github.io/ingress-nginx/deploy/
+# 2. Set your Docker Hub user in k8s/kustomization.yaml and your domain in k8s/ingress.yaml
+kubectl apply -f k8s/namespace.yaml
+kubectl -n olea create secret generic olea-secrets \
+  --from-literal=POSTGRES_USER=olea \
+  --from-literal=POSTGRES_PASSWORD="$(openssl rand -hex 16)" \
+  --from-literal=POSTGRES_DB=olea \
+  --from-literal=JWT_SECRET_KEY="$(openssl rand -hex 32)" \
+  --from-literal=PINECONE_API_KEY=<your key>
+kubectl apply -k k8s/
+BASE_URL=https://olea.example.com ./scripts/smoke_test.sh
+```
+
+## ⚙️ Local Setup without Docker (all-in-one)
 
 **Database (PostgreSQL)**
 
