@@ -106,9 +106,26 @@ BASE_URL=http://localhost:8090 ./scripts/smoke_test.sh
 ./scripts/k8s_local.sh down
 ```
 
-The app is served through the real NGINX Ingress Controller on **http://localhost:8090**; Docker Desktop's
-load balancer stands in for the cloud one. Give Docker Desktop at least ~6 GB of memory
-(Settings → Resources) and stop the compose stack (`docker compose stop`) while the cluster runs.
+| What | Where |
+|---|---|
+| App, through the real NGINX Ingress Controller | **http://localhost:8090** (Docker Desktop's load balancer stands in for the cloud one) |
+| Cluster PostgreSQL, for pgAdmin / psql | `localhost:5433`, credentials from `.env` (docker compose's database stays on 5432) |
+| Pods, Services, logs | `kubectl get pods -n olea`, or the [Headlamp](https://headlamp.dev) desktop app → cluster `docker-desktop` |
+
+**Day to day:**
+
+| Situation | Command |
+|---|---|
+| After a reboot / Docker Desktop start | Nothing to do: the cluster and pods come back, data is kept |
+| After changing code | `docker compose build <services>` then `./scripts/k8s_local.sh up` (only changed images roll out) |
+| Restart pods without changes | `kubectl -n olea rollout restart deployment` |
+| Remove the app (keeps data) | `./scripts/k8s_local.sh down` |
+
+About **5 GB** of Docker Desktop memory (Settings → Resources) fits the 3-node cluster on a 14–16 GB laptop;
+much more starves the host and slows everything down. Run either the cluster or the compose stack, not both.
+Local images get content-based tags, so a restart needs no image pulls and a rebuilt image always rolls out.
+Use Headlamp's **desktop app** rather than the Docker Desktop extension: the extension runs in a container,
+where the kubeconfig's `127.0.0.1` API address does not reach the cluster ("Bad Gateway").
 
 **Production cluster:**
 
@@ -129,6 +146,10 @@ helm upgrade --install olea helm/olea -n olea \
   --set imageRegistry=docker.io/<dockerhub user> --set ingress.host=<your domain> --atomic
 ```
 
+Demo mode is off in the production values (no demo accounts, no passwordless access); pass
+`--set config.DEMO_MODE=true` only for a private showcase cluster. The Ingress serves plain HTTP;
+add [cert-manager](https://cert-manager.io) for HTTPS once a domain points at the cluster.
+
 ## ⚙️ Local Setup without Docker (all-in-one)
 
 **Database (PostgreSQL)**
@@ -146,7 +167,8 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Tables are created automatically on startup. With `DEMO_MODE=true` (the default) the database is also
+Tables are created automatically on startup. With `DEMO_MODE=true` (the default in `.env.example` and
+`values-local.yaml`; **off** in the production Helm values) the database is also
 seeded with mock data from [`backend/seed.py`](backend/seed.py): a demo account, two sample users,
 saved predictions and chat history. Run `python seed.py` to seed manually.
 
@@ -157,7 +179,7 @@ saved predictions and chat history. Run `python seed.py` to seed manually.
 | Sample | `youssef.trabelsi@example.com` | `Password123!` |
 
 The **"Get a direct access here"** button on the main page signs in as the demo account without a password.
-Set `DEMO_MODE=false` in production to disable both the seed and direct access.
+Keep `DEMO_MODE=false` on any public deployment (Render included): it disables both the seed and direct access.
 
 **Frontend**
 
