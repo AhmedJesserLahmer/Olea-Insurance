@@ -5,6 +5,7 @@
 #   secrets.DOCKERHUB_TOKEN     Docker Hub access token (read/write)
 #   secrets.KUBE_CONFIG         base64-encoded kubeconfig for the cluster   (deploy only)
 #   vars.DEPLOY_ENABLED         "true" to run the deploy job                (deploy only)
+# The cluster needs ingress-nginx and the olea-secrets Secret (see README, Kubernetes section).
 name: CI/CD
 
 on:
@@ -55,9 +56,23 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: /
 
+  helm-chart:
+    name: Unit tests (Helm chart)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.18.3
+      - run: helm lint helm/olea
+      - name: Render production and local values
+        run: |
+          helm template olea helm/olea -n olea > /dev/null
+          helm template olea helm/olea -n olea -f helm/olea/values-local.yaml > /dev/null
+
   smoke-tests:
     name: Smoke tests (docker compose)
-    needs: [backend-unit-tests, frontend-build]
+    needs: [backend-unit-tests, frontend-build, helm-chart]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -132,35 +147,25 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
 
   deploy:
-    name: Deploy to Kubernetes
+    name: Deploy to Kubernetes (Helm)
     needs: build-and-push
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: production
-    env:
-      REGISTRY: ${{ secrets.DOCKERHUB_USERNAME }}
-      TAG: ${{ github.sha }}
     steps:
-      - uses: azure/setup-kubectl@v4
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.18.3
       - name: Configure cluster access
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
-      - name: Roll out the new images
+      - name: Upgrade the release to this commit's images
+        # --atomic waits for every rollout and rolls the whole release back if one fails
         run: |
-          # deployment=container:image
-          for spec in api=api:olea-api prediction=prediction:olea-prediction rag=rag:olea-rag \
-                      history-writer=history-writer:olea-history-writer frontend=frontend:olea-frontend; do
-            deployment="${spec%%=*}"; rest="${spec#*=}"; container="${rest%%:*}"; image="${rest#*:}"
-            kubectl -n olea set image "deployment/$deployment" "$container=$REGISTRY/$image:$TAG"
-          done
-      - name: Wait for the rollout
-        run: |
-          for deployment in api prediction rag history-writer frontend; do
-            if ! kubectl -n olea rollout status "deployment/$deployment" --timeout=10m; then
-              echo "Rollout of $deployment failed, rolling back"
-              kubectl -n olea rollout undo "deployment/$deployment"
-              exit 1
-            fi
-          done
+          helm upgrade --install olea helm/olea -n olea --create-namespace \
+            --set imageRegistry="docker.io/${{ secrets.DOCKERHUB_USERNAME }}" \
+            --set-string imageTag="${{ github.sha }}" \
+            --atomic --timeout 15m
