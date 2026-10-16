@@ -1,0 +1,59 @@
+# Local stack: PostgreSQL + FastAPI backend + Next.js frontend
+# Usage: cp .env.example .env  (then fill in secrets)  &&  docker compose up --build
+name: olea
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: olea/api:local
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      # Hugging Face models downloaded by the RAG pipeline survive restarts
+      - hf-cache:/app/.cache/huggingface
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # TinyLlama + embeddings need a few GB; the cap stops the RAG model from starving the host
+    mem_limit: ${API_MEMORY_LIMIT:-6g}
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Called from the browser, so it must be the host-facing API URL
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:${API_PORT:-8000}
+    image: olea/frontend:local
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  hf-cache:
