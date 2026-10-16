@@ -83,6 +83,8 @@ def run() -> None:
         "group.id": os.getenv("KAFKA_CONSUMER_GROUP", "history-writer"),
         "enable.auto.commit": False,
         "auto.offset.reset": "earliest",
+        # Topics may be created after the consumer starts (Helm post-install hook)
+        "topic.metadata.refresh.interval.ms": 10000,
     })
     producer = Producer({"bootstrap.servers": bootstrap, "client.id": "history-writer"})
     consumer.subscribe(list(TOPICS))
