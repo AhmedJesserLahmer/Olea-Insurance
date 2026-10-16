@@ -8,3 +8,27 @@ resources:
   - config.yaml
   - postgres.yaml
   - kafka.yaml
+  - apps/frontend.yaml
+  - apps/api.yaml
+  - apps/prediction.yaml
+  - apps/rag.yaml
+  - apps/history-writer.yaml
+
+# Image names in the manifests are placeholders: point them at your Docker Hub account.
+# CI deploys exact commit tags with `kubectl set image`; newTag is for the first apply.
+images:
+  - name: olea-frontend
+    newName: docker.io/YOUR_DOCKERHUB_USER/olea-frontend
+    newTag: latest
+  - name: olea-api
+    newName: docker.io/YOUR_DOCKERHUB_USER/olea-api
+    newTag: latest
+  - name: olea-prediction
+    newName: docker.io/YOUR_DOCKERHUB_USER/olea-prediction
+    newTag: latest
+  - name: olea-rag
+    newName: docker.io/YOUR_DOCKERHUB_USER/olea-rag
+    newTag: latest
+  - name: olea-history-writer
+    newName: docker.io/YOUR_DOCKERHUB_USER/olea-history-writer
+    newTag: latest
