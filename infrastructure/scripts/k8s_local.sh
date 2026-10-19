@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Run the Helm chart on Docker Desktop's local Kubernetes.
-#   ./scripts/k8s_local.sh up       install/upgrade ingress-nginx + the olea chart, then wait
-#   ./scripts/k8s_local.sh status   show nodes, pods and the entry URL
-#   ./scripts/k8s_local.sh down     uninstall the olea release (keeps ingress-nginx and volumes)
+#   ./infrastructure/scripts/k8s_local.sh up       install/upgrade ingress-nginx + the olea chart, then wait
+#   ./infrastructure/scripts/k8s_local.sh status   show nodes, pods and the entry URL
+#   ./infrastructure/scripts/k8s_local.sh down     uninstall the olea release (keeps ingress-nginx and volumes)
 #
 # Needs: Docker Desktop with Kubernetes enabled, kubectl, helm, and images built with
 # docker compose (olea/<service>:local). Secrets are read from .env, never written to a file.
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."   # repository root
 
 KUBE_CONTEXT="${KUBE_CONTEXT:-docker-desktop}"
 DOCKER_CONTEXT="${DOCKER_CONTEXT:-desktop-linux}"
@@ -48,8 +48,8 @@ up() {
     --wait --timeout 5m
 
   echo "==> olea chart"
-  helm_ upgrade --install olea helm/olea -n "$NAMESPACE" --create-namespace \
-    -f helm/olea/values-local.yaml \
+  helm_ upgrade --install olea infrastructure/helm/olea -n "$NAMESPACE" --create-namespace \
+    -f infrastructure/helm/olea/values-local.yaml \
     --set-string secrets.values.POSTGRES_USER="$POSTGRES_USER" \
     --set-string secrets.values.POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
     --set-string secrets.values.POSTGRES_DB="$POSTGRES_DB" \
@@ -67,7 +67,7 @@ status() {
   kubectl_ -n "$NAMESPACE" get pods -o wide
   echo
   echo "App (through the Ingress): http://localhost:$INGRESS_HTTP_PORT"
-  echo "Smoke test: BASE_URL=http://localhost:$INGRESS_HTTP_PORT ./scripts/smoke_test.sh"
+  echo "Smoke test: BASE_URL=http://localhost:$INGRESS_HTTP_PORT ./infrastructure/scripts/smoke_test.sh"
 }
 
 down() {

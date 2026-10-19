@@ -1,9 +1,9 @@
 # Small footprint for a local cluster (Docker Desktop Kubernetes, k3d, kind).
-# Use through scripts/k8s_local.sh, which also passes the secrets from .env.
+# Use through infrastructure/scripts/k8s_local.sh, which also passes the secrets from .env.
 
 imageRegistry: olea-local
 imageTag: local
-# scripts/k8s_local.sh tags each image with its content id (services.<name>.tag), so a
+# infrastructure/scripts/k8s_local.sh tags each image with its content id (services.<name>.tag), so a
 # rebuilt image gets a new tag. Nodes keep pulled images: no pulls after a restart.
 imagePullPolicy: IfNotPresent
 

@@ -1,5 +1,5 @@
 # Production defaults. Local clusters: add -f values-local.yaml
-#   helm upgrade --install olea helm/olea -n olea --create-namespace
+#   helm upgrade --install olea infrastructure/helm/olea -n olea --create-namespace
 
 # Images are <imageRegistry>/<service image>:<imageTag>, e.g. docker.io/me/olea-api:3f9c2ab
 imageRegistry: docker.io/YOUR_DOCKERHUB_USER

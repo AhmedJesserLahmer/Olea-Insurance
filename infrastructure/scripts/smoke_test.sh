@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Smoke test against a running stack (docker compose or Kubernetes), through the gateway/Ingress.
-#   BASE_URL=http://localhost:8080 ./scripts/smoke_test.sh
+#   BASE_URL=http://localhost:8080 ./infrastructure/scripts/smoke_test.sh
 # Set SMOKE_RAG=1 to also require a RAG answer (needs PINECONE_API_KEY and several GB of RAM).
 set -euo pipefail
 
