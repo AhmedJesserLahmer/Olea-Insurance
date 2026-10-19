@@ -1,4 +1,0 @@
-# Everything, for the all-in-one main.py (e.g. Render).
-# Each service image installs only its own file from requirements/.
--r requirements/prediction.txt
--r requirements/rag.txt

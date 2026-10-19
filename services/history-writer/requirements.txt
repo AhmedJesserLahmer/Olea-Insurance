@@ -1,0 +1,2 @@
+# history-writer: Kafka consumer; only the shared stack
+-r ../shared/requirements.txt

@@ -1,0 +1,2 @@
+# api-svc: accounts and history; only the shared stack
+-r ../shared/requirements.txt

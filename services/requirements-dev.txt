@@ -1,0 +1,4 @@
+# Unit tests for every service (no torch: the RAG pipeline is stubbed in tests)
+-r prediction/requirements.txt
+pytest
+httpx

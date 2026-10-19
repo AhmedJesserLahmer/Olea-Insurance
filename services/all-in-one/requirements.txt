@@ -1,0 +1,3 @@
+# Everything, for the all-in-one app (e.g. Render): prediction and RAG stacks
+-r ../prediction/requirements.txt
+-r ../rag/requirements.txt
