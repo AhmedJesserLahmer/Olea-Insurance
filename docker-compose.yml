@@ -10,10 +10,6 @@ x-backend-env: &backend-env
   DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
-x-backend-build: &backend-build
-  context: .
-  dockerfile: backend/Dockerfile
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -79,8 +75,8 @@ services:
   # api-svc: accounts + history; creates the schema and seeds demo data
   api:
     build:
-      <<: *backend-build
-      target: api
+      context: ./services
+      dockerfile: api/Dockerfile
     image: olea/api:local
     restart: unless-stopped
     env_file: .env
@@ -92,8 +88,8 @@ services:
 
   prediction:
     build:
-      <<: *backend-build
-      target: prediction
+      context: ./services
+      dockerfile: prediction/Dockerfile
     image: olea/prediction:local
     restart: unless-stopped
     env_file: .env
@@ -107,8 +103,8 @@ services:
 
   rag:
     build:
-      <<: *backend-build
-      target: rag
+      context: ./services
+      dockerfile: rag/Dockerfile
     image: olea/rag:local
     restart: unless-stopped
     env_file: .env
@@ -126,8 +122,8 @@ services:
 
   history-writer:
     build:
-      <<: *backend-build
-      target: history-writer
+      context: ./services
+      dockerfile: history-writer/Dockerfile
     image: olea/history-writer:local
     restart: unless-stopped
     env_file: .env

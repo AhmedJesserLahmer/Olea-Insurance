@@ -1,0 +1,10 @@
+# Build context is services/: keep tests, caches and secrets out of the images
+**/tests
+**/__pycache__
+**/*.pyc
+.pytest_cache
+conftest.py
+pytest.ini
+requirements-dev.txt
+**/.env
+**/.env.*
