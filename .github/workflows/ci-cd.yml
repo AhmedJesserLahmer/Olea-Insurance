@@ -22,20 +22,20 @@ permissions:
   contents: read
 
 jobs:
-  backend-unit-tests:
-    name: Unit tests (backend)
+  services-unit-tests:
+    name: Unit tests (services)
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: services
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: backend/requirements/*.txt
-      - run: pip install -r requirements/dev.txt
+          cache-dependency-path: services/**/requirements*.txt
+      - run: pip install -r requirements-dev.txt
       - run: pytest -q
 
   frontend-build:
@@ -64,15 +64,15 @@ jobs:
       - uses: azure/setup-helm@v4
         with:
           version: v3.18.3
-      - run: helm lint helm/olea
+      - run: helm lint infrastructure/helm/olea
       - name: Render production and local values
         run: |
-          helm template olea helm/olea -n olea > /dev/null
-          helm template olea helm/olea -n olea -f helm/olea/values-local.yaml > /dev/null
+          helm template olea infrastructure/helm/olea -n olea > /dev/null
+          helm template olea infrastructure/helm/olea -n olea -f infrastructure/helm/olea/values-local.yaml > /dev/null
 
   smoke-tests:
     name: Smoke tests (docker compose)
-    needs: [backend-unit-tests, frontend-build, helm-chart]
+    needs: [services-unit-tests, frontend-build, helm-chart]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
       - name: Start the stack
         run: docker compose up -d
       - name: Run smoke tests
-        run: ./scripts/smoke_test.sh
+        run: ./infrastructure/scripts/smoke_test.sh
         env:
           BASE_URL: http://localhost:8080
           SMOKE_TIMEOUT: "240"
@@ -106,26 +106,22 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          # Each service builds from its own Dockerfile, with services/ as the context
           - image: olea-api
-            context: .
-            file: backend/Dockerfile
-            target: api
+            context: services
+            file: services/api/Dockerfile
           - image: olea-prediction
-            context: .
-            file: backend/Dockerfile
-            target: prediction
+            context: services
+            file: services/prediction/Dockerfile
           - image: olea-rag
-            context: .
-            file: backend/Dockerfile
-            target: rag
+            context: services
+            file: services/rag/Dockerfile
           - image: olea-history-writer
-            context: .
-            file: backend/Dockerfile
-            target: history-writer
+            context: services
+            file: services/history-writer/Dockerfile
           - image: olea-frontend
             context: frontend
             file: frontend/Dockerfile
-            target: runtime
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -137,7 +133,6 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.file }}
-          target: ${{ matrix.target }}
           push: true
           # The commit tag is what Kubernetes deploys; latest is only a convenience
           tags: |
@@ -169,7 +164,7 @@ jobs:
       - name: Upgrade the release to this commit's images
         # --atomic waits for every rollout and rolls the whole release back if one fails
         run: |
-          helm upgrade --install olea helm/olea -n olea --create-namespace \
+          helm upgrade --install olea infrastructure/helm/olea -n olea --create-namespace \
             --set imageRegistry="docker.io/${{ secrets.DOCKERHUB_USERNAME }}" \
             --set-string imageTag="${{ github.sha }}" \
             --atomic --timeout 15m
