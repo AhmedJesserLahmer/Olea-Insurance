@@ -29,18 +29,41 @@ event; the **history-writer** consumes them and stores them in **PostgreSQL**.
 | Service | Code | Routes | Role |
 |---|---|---|---|
 | frontend-svc | [`frontend/`](frontend) | `/` | Next.js UI |
-| api-svc | [`api_service.py`](backend/api_service.py) | `/auth/*`, `/predictions/me` | Accounts, history; owns the schema and demo seed |
-| prediction-svc | [`prediction_service.py`](backend/prediction_service.py) | `/predict-bundle` | Runs `model.pkl`, publishes `client.profile.submitted` + `prediction.completed` |
-| rag-svc | [`rag_service.py`](backend/rag_service.py) | `/rag` | Pinecone + TinyLlama, publishes `chat.completed` |
-| history-writer | [`history_writer.py`](backend/history_writer.py) | — | Kafka consumer → PostgreSQL |
+| api-svc | [`services/api`](services/api) | `/auth/*`, `/predictions/me` | Accounts, history; owns the schema and demo seed |
+| prediction-svc | [`services/prediction`](services/prediction) | `/predict-bundle` | Runs `model.pkl`, publishes `client.profile.submitted` + `prediction.completed` |
+| rag-svc | [`services/rag`](services/rag) | `/rag` | Pinecone + TinyLlama, publishes `chat.completed` |
+| history-writer | [`services/history-writer`](services/history-writer) | — | Kafka consumer → PostgreSQL |
 
 - **Exactly-once storage:** each event has an `event_id`; Kafka may redeliver, but
-  [`persistence.apply_event`](backend/persistence.py) stores each id once. Unstorable messages go to `history.dead-letter`.
+  [`persistence.apply_event`](services/shared/olea_common/persistence.py) stores each id once. Unstorable messages go to `history.dead-letter`.
 - **No Kafka? No problem:** without `KAFKA_BOOTSTRAP_SERVERS` (or if Kafka does not acknowledge an event)
-  events are written directly to PostgreSQL. The all-in-one [`main.py`](backend/main.py) (used on Render) works this way.
+  events are written directly to PostgreSQL. The [all-in-one app](services/all-in-one) (used on Render) works this way.
 - **Stateless auth:** tokens carry the user id, so prediction-svc and rag-svc verify them without a database lookup.
 
 How a request reaches a pod across the cluster's nodes: [docs/kubernetes-request-flow.svg](docs/kubernetes-request-flow.svg).
+
+## 🗂️ Project structure
+
+```
+frontend/                      Next.js UI
+services/                      Python services (FastAPI), one folder each
+├── shared/olea_common/        code every service uses: database, models, auth, events, persistence, seed
+├── api/                       api-svc: accounts + history
+├── prediction/                prediction-svc: model.pkl + the PDF brief
+├── rag/                       rag-svc: RAG chat
+├── history-writer/            Kafka consumer → PostgreSQL
+└── all-in-one/                every route in one process (Render)
+infrastructure/
+├── helm/olea/                 Kubernetes chart (production + local values)
+├── nginx/                     docker compose gateway (stand-in for the Ingress)
+└── scripts/                   k8s_local.sh, smoke_test.sh
+docker-compose.yml             local stack: PostgreSQL, Kafka, the services, the gateway
+.github/workflows/ci-cd.yml    tests → smoke tests → Docker Hub → Helm deploy
+docs/                          architecture diagrams
+```
+
+Each service folder holds its package (`olea_<service>/`), `Dockerfile`, `requirements.txt` and `tests/`.
+Services import only `olea_common` and their own package; images are built with `services/` as the context.
 
 ## 🛠️ Tools & Tech Stack
 
@@ -59,7 +82,7 @@ Our stack was carefully selected to optimize performance and reduce friction dur
 ```bash
 cp .env.example .env      # set POSTGRES_PASSWORD, JWT_SECRET_KEY, PINECONE_API_KEY
 docker compose up --build
-./scripts/smoke_test.sh   # end-to-end check through the gateway
+./infrastructure/scripts/smoke_test.sh   # end-to-end check through the gateway
 ```
 
 Open **http://localhost:8080**. The NGINX gateway routes paths like the Kubernetes Ingress does.
@@ -72,18 +95,19 @@ PostgreSQL is also exposed on `localhost:5432` for inspection.
 ## 🧪 Tests
 
 ```bash
-cd backend
-pip install -r requirements/dev.txt
-pytest                    # unit tests on SQLite, no PostgreSQL or Kafka needed
+cd services
+pip install -r requirements-dev.txt
+pytest                    # every service's tests, on SQLite: no PostgreSQL or Kafka needed
+pytest api/tests          # one service only
 ```
 
 ## 🚦 CI/CD
 
 [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) runs on every push and pull request:
 
-1. **Unit tests**: backend `pytest`, the frontend production build, and Helm chart lint/render
-2. **Smoke tests**: the full docker compose stack and `scripts/smoke_test.sh`
-3. **Build & push** (`main` only): 5 images to Docker Hub, tagged with the commit SHA and `latest`
+1. **Unit tests**: every service's `pytest`, the frontend production build, and Helm chart lint/render
+2. **Smoke tests**: the full docker compose stack and `infrastructure/scripts/smoke_test.sh`
+3. **Build & push** (`main` only): 5 images to Docker Hub, each from its service's Dockerfile, tagged with the commit SHA and `latest`
 4. **Deploy** (`main`, opt-in): `helm upgrade --install --atomic` with the commit tag; a failed rollout rolls the release back
 
 Repository settings: secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, and for deploys `KUBE_CONFIG`
@@ -91,19 +115,19 @@ Repository settings: secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, and for de
 
 ## ☸️ Kubernetes (Helm)
 
-The chart in [`helm/olea`](helm/olea) deploys PostgreSQL, Kafka (KRaft), the five services and the Ingress.
-[`values.yaml`](helm/olea/values.yaml) holds the production defaults (3 Kafka brokers, 2 replicas per service);
-[`values-local.yaml`](helm/olea/values-local.yaml) shrinks everything for a laptop.
+The chart in [`infrastructure/helm/olea`](infrastructure/helm/olea) deploys PostgreSQL, Kafka (KRaft), the five services and the Ingress.
+[`values.yaml`](infrastructure/helm/olea/values.yaml) holds the production defaults (3 Kafka brokers, 2 replicas per service);
+[`values-local.yaml`](infrastructure/helm/olea/values-local.yaml) shrinks everything for a laptop.
 
 **Local cluster (Docker Desktop):** enable Kubernetes in Docker Desktop → Settings → Kubernetes
 (the *kind* option gives several nodes), install [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
 and [`helm`](https://helm.sh/docs/intro/install/), build the images once with `docker compose build`, then:
 
 ```bash
-./scripts/k8s_local.sh up        # ingress-nginx + the chart, secrets taken from .env
-BASE_URL=http://localhost:8090 ./scripts/smoke_test.sh
-./scripts/k8s_local.sh status    # nodes and pods
-./scripts/k8s_local.sh down
+./infrastructure/scripts/k8s_local.sh up        # ingress-nginx + the chart, secrets taken from .env
+BASE_URL=http://localhost:8090 ./infrastructure/scripts/smoke_test.sh
+./infrastructure/scripts/k8s_local.sh status    # nodes and pods
+./infrastructure/scripts/k8s_local.sh down
 ```
 
 | What | Where |
@@ -117,9 +141,9 @@ BASE_URL=http://localhost:8090 ./scripts/smoke_test.sh
 | Situation | Command |
 |---|---|
 | After a reboot / Docker Desktop start | Nothing to do: the cluster and pods come back, data is kept |
-| After changing code | `docker compose build <services>` then `./scripts/k8s_local.sh up` (only changed images roll out) |
+| After changing code | `docker compose build <services>` then `./infrastructure/scripts/k8s_local.sh up` (only changed images roll out) |
 | Restart pods without changes | `kubectl -n olea rollout restart deployment` |
-| Remove the app (keeps data) | `./scripts/k8s_local.sh down` |
+| Remove the app (keeps data) | `./infrastructure/scripts/k8s_local.sh down` |
 
 About **5 GB** of Docker Desktop memory (Settings → Resources) fits the 3-node cluster on a 14–16 GB laptop;
 much more starves the host and slows everything down. Run either the cluster or the compose stack, not both.
@@ -142,7 +166,7 @@ kubectl -n olea create secret generic olea-secrets \
   --from-literal=JWT_SECRET_KEY="$(openssl rand -hex 32)" \
   --from-literal=PINECONE_API_KEY=<your key>
 # 3. The app (CI runs this step on every push to main, with the commit's image tag)
-helm upgrade --install olea helm/olea -n olea \
+helm upgrade --install olea infrastructure/helm/olea -n olea \
   --set imageRegistry=docker.io/<dockerhub user> --set ingress.host=<your domain> --atomic
 ```
 
@@ -158,19 +182,23 @@ add [cert-manager](https://cert-manager.io) for HTTPS once a domain points at th
 createdb olea   # or use any hosted PostgreSQL instance
 ```
 
-**Backend**
+**Backend (all-in-one app)**
 
 ```bash
-cd backend
-cp .env.example .env   # set DATABASE_URL=postgresql+psycopg2://user:pass@host:5432/olea
-pip install -r requirements.txt
-uvicorn main:app --reload
+cd services
+cp all-in-one/.env.example .env   # set DATABASE_URL=postgresql+psycopg2://user:pass@host:5432/olea
+pip install -r all-in-one/requirements.txt
+PYTHONPATH=shared:api:prediction:rag:all-in-one uvicorn olea_all.app:app --reload
 ```
+
+**On Render:** create a *Docker* web service with Dockerfile path `services/all-in-one/Dockerfile` and
+build context `services`; it listens on Render's `$PORT`. Set `DATABASE_URL`, `JWT_SECRET_KEY` and
+`DEMO_MODE=false` in its environment.
 
 Tables are created automatically on startup. With `DEMO_MODE=true` (the default in `.env.example` and
 `values-local.yaml`; **off** in the production Helm values) the database is also
-seeded with mock data from [`backend/seed.py`](backend/seed.py): a demo account, two sample users,
-saved predictions and chat history. Run `python seed.py` to seed manually.
+seeded with mock data from [`seed.py`](services/shared/olea_common/seed.py): a demo account, two sample users,
+saved predictions and chat history. Seed manually with `cd services && PYTHONPATH=shared python -m olea_common.seed`.
 
 | Account | Email | Password |
 |---|---|---|
